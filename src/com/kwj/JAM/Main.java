@@ -19,7 +19,7 @@ public class Main {
         String user = "root"; // 3DB 사용자 이름
         String password = "qwer"; // DB 비밀번호
 
-//        객체 선언
+        // 객체 선언
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -154,15 +154,70 @@ public class Main {
 				continue;
 			}
 			
-			if (cmd.equals("exit")) {
+			else if (cmd.startsWith("article modify ")) {
+				System.out.println("== 게시물 수정 ==");
+				
+				int id = Integer.parseInt(cmd.split(" ")[2]);
+				
+				System.out.print("수정할 제목) ");
+				String title = sc.nextLine();
+				System.out.print("수정할 내용) ");
+				String body = sc.nextLine();
+				
+				if (id == 0) {
+					System.out.println("명령어를 다시 입력해 주세요.");
+					continue;
+				}
+				
+		        try {
+		            // 데이터베이스 연결
+		            conn = DriverManager.getConnection(url, user, password);
+		            
+		            String slq = "UPDATE article";
+		            slq += " SET title = '" + title + "'";
+		            slq += " , `body` = '" + body + "'";
+		            slq += " , updateDate = NOW()";
+		            slq += " WHERE id = " + id + ";";
+
+		            pstmt = conn.prepareStatement(slq);
+		            pstmt.executeUpdate();
+		           
+		        }  catch (SQLException e) {
+		            System.out.println("데이터베이스 연결 실패: " + e.getMessage());
+		        } finally {
+		            // 연결 해제 
+		            if (pstmt != null) {
+		            	try {
+		            		pstmt.close();
+		            	} catch (SQLException e) {
+		            		e.printStackTrace();
+		            	}
+		            }
+		            // 연결 해제
+		            if (conn != null) {
+		                try {
+		                	conn.close();
+		                } catch (SQLException e) {
+		                	e.printStackTrace();
+		                }
+		            }
+		        }
+				System.out.printf("%d 번 게시물이 수정되었습니다. \n", id);
+				continue;
+			}
+			
+			
+			else if (cmd.equals("exit")) {
 				break;
 			}
 			
-			sc.close();
-			System.out.println("== 프로그램 종료 ==");
-			
-			
+			else {
+				System.out.println("명령어를 다시 입력해 주세요.");
+				continue;
+			}
 		}
+		sc.close();
+		System.out.println("== 프로그램 종료 ==");
 	}
 
 
