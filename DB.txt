@@ -4,11 +4,15 @@ USE jdbc_article_manager;
 
 CREATE TABLE article(
 	id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT
-	, regdate DATETIME NOT NULL
+	, regDate DATETIME NOT NULL
 	, updateDate DATETIME NOT NULL
 	, title VARCHAR(100) NOT NULL
 	, `body` TEXT NOT null
 );
+
+ALTER TABLE article
+	CHANGE COLUMN regdate regDate
+	DATETIME NOT NULL;
 
 INSERT INTO article
 	SET regDate = NOW()
@@ -16,5 +20,31 @@ INSERT INTO article
 		, title = CONCAT('제목_', RAND())
 		, body = CONCAT('내용_', RAND());
 		
-SELECT * FROM article;
+SELECT * FROM article
+	ORDER BY id DESC;
 DESC article;
+
+UPDATE article
+	SET title = 'zzzzzzzzzzzzz'
+		, `body` = 'zzzzzzzzzzzzzzz'
+		, updateDate = NOW()
+	WHERE id = 1;
+	
+CREATE TABLE `member`(
+	id int UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT 
+	, regDate datetime NOT NULL
+	, updateDate datetime NOT NULL
+	, loginId varchar(50) NOT NULL UNIQUE
+	, loginPw varchar(100) NOT NULL
+	, `name` varchar(20) NOT NULL 
+);
+
+INSERT INTO `member`
+	SET regDate = NOW()
+		, updateDate = NOW()
+		, loginId = 'user1'
+		, loginPw = '1234'
+		, `name` = '홍길동';
+
+DESC `member`;
+SELECT * FROM `member`;
