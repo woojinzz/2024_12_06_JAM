@@ -3,16 +3,10 @@ package com.kwj.JAM;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 import com.kwj.JAM.Controller.ArticleController;
 import com.kwj.JAM.Controller.MemberController;
-import com.kwj.JAM.dto.Article;
-import com.kwj.JAM.util.DBUtil;
-import com.kwj.JAM.util.SecSql;
 
 public class App {
 
@@ -20,13 +14,13 @@ public class App {
 	private final String user = "root"; // 3DB 사용자 이름
 	private final String password = "qwer"; // DB 비밀번호
 
+
 	public void run() {
 
 		System.out.println("== 프로그램 시작 ==");
 		Scanner sc = new Scanner(System.in);
-		// 객체 선언
 		Connection conn = null;
-//		PreparedStatement pstmt = null;
+		
 	
 		try {
 			conn = DriverManager.getConnection(url, user, password);
@@ -48,6 +42,11 @@ public class App {
 				if (cmd.equals("member join")) {
 					memberController.doJoin();
 				}
+				
+				else if (cmd.equals("member login")) {
+					memberController.doLogin();
+				}
+				
 				else if (cmd.equals("article write")) {
 					articleController.doWrite();
 				}
@@ -62,6 +61,12 @@ public class App {
 
 				else if (cmd.startsWith("article modify ")) {
 					articleController.doModify(cmd);
+				}
+				else if (cmd.startsWith("article delete")) {
+					articleController.doDelete(cmd);
+				}
+				else if (cmd.startsWith("member logout")) {
+					memberController.dologout(cmd);
 				}
 				else {
 					System.out.println("명령어를 다시 입력해 주세요.");

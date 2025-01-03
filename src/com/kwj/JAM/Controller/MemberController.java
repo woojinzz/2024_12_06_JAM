@@ -4,25 +4,22 @@ import java.sql.Connection;
 import java.util.Scanner;
 
 import com.kwj.JAM.Service.MemberService;
-import com.kwj.JAM.util.DBUtil;
-import com.kwj.JAM.util.SecSql;
+import com.kwj.JAM.dto.Member;
 
 public class MemberController{
 	
-	private Connection conn;
+	private MemberService memberService;
 	private Scanner sc;
-	
-	MemberService memberService = new MemberService();
-	
-	
+	private boolean loginChk;
 	
 	public MemberController(Connection conn, Scanner sc) {
-		this.conn = conn;
+		this.memberService = new MemberService(conn);
 		this.sc = sc;
+		this.loginChk = false;
+		
 	}
 
 	public void doJoin() {
-		
 		System.out.println("== 회원가입 페이지 ==");
 		String loginId = null;
 		String loginPw = null;
@@ -30,7 +27,6 @@ public class MemberController{
 		String name = null;
 		
 		while(true) {
-			
 			System.out.print("아이디) ");
 			loginId = sc.nextLine().trim();
 
@@ -39,8 +35,7 @@ public class MemberController{
 				continue;
 			}
 			
-			boolean isLoginIdDup = memberService.dojoin(loginId, conn);
-			
+			boolean isLoginIdDup = memberService.doLoginChk(loginId);
 			
 			if (isLoginIdDup) {
 				System.out.printf("[ %s ] 는 이미 사용중인 아이디입니다.\n", loginId);
@@ -81,20 +76,69 @@ public class MemberController{
 			break;
 			
 		}
-		
-		SecSql sql = new SecSql();
-		sql.append("INSERT INTO `member`");
-		sql.append("SET regDate = NOW()");
-		sql.append(", updateDate = NOW()");
-		sql.append(", loginId = ?", loginId);
-		sql.append(", loginPw = ?", loginPw);
-		sql.append(", name = ?", name);
-		
-		DBUtil.insert(conn, sql);
-		
+	
+		memberService.dojoin(loginId, loginPw, name);
 		System.out.printf("[ %s ] 회원님 가입을 축하합니다.\n", loginId );
 		
+	}
+
+	public void doLogin() {
+
+		String loginId = null;
+		String loginPw = null;
 		
+		if (loginChk) {
+			System.out.println("로그아웃을 먼저 해주세요.");
+			return;
+		}
+		
+		while(true) {
+			
+			System.out.println("== 로그인 ==");
+			System.out.print("아이디) ");
+			loginId = sc.nextLine().trim();
+			System.out.print("비밀번호) ");
+			loginPw = sc.nextLine().trim();
+			
+			if (loginId.length() == 0) {
+				System.out.println("아이디는 필수 입력 값 입니다.");
+				continue;
+			}
+			if (loginPw.length() == 0) {
+				System.out.println("비밀번호는 필수 입력 값 입니다.");
+				continue;
+			}
+			
+			Member member = memberService.getMemberByLoginId(loginId);
+			
+			if (member == null) {
+				System.out.printf("[ %s ] 는 존재하지 않는 아이디 입니다. \n", loginId);
+				continue;
+			}
+			
+			if (member.loginPw.equals(loginPw) == false) {
+				System.out.printf("비밀번호가 일치하지 않습니다.");
+				continue;
+			}
+			break;
+		}
+
+		System.out.printf("[ %s] 로그인 되었습니다.");
+	
+		
+	}
+
+	public void dologout(String cmd) {
+		
+		if (loginChk) {
+			loginChk = false; 
+			System.out.println("로그아웃 되었습니다.");
+		}
+		else {
+			System.out.println("로그인을 먼저 해주세요.");
+		}
+		
+	
 	}
 
 }

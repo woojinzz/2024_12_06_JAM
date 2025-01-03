@@ -1,60 +1,36 @@
 package com.kwj.JAM.Controller;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
+import com.kwj.JAM.Service.ArticleService;
 import com.kwj.JAM.dto.Article;
-import com.kwj.JAM.util.DBUtil;
-import com.kwj.JAM.util.SecSql;
 
 public class ArticleController {
-	
-	private Connection conn;
+
+	private ArticleService articleService;
 	private Scanner sc;
 
 	public ArticleController(Connection conn, Scanner sc) {
-		this.conn = conn;
-		this.sc  = sc;
-	
+		this.articleService = new ArticleService(conn);
+		this.sc = sc;
 	}
 
 	public void doWrite() {
 		System.out.println("== 게시물 작성 ==");
-
 		System.out.print("제목) ");
 		String title = sc.nextLine().trim();
 		System.out.print("내용) ");
 		String body = sc.nextLine().trim();
 
-		SecSql sql = new SecSql();
-		sql.append("INSERT INTO article"); 
-		sql.append("SET regDate = NOW()");
-		sql.append(", updateDate = NOW()");
-		sql.append(", title = ?", title);
-		sql.append(", `body` = ?", body);
-		
-		int id = DBUtil.insert(conn, sql);
-
+		int id = articleService.doWrite(title, body);
 		System.out.println(id + "번 글이 작성되었습니다.");
-		
-		
 	}
 
 	public void showList() {
-		List<Article> articles = new ArrayList<>();
 		
-		SecSql sql = new SecSql();
-		sql.append("SELECT * FROM article");
-		sql.append("ORDER BY id DESC");
-		
-		List<Map<String, Object>> articleListMap = DBUtil.selectRows(conn, sql);
-		
-		for (Map<String, Object> articleMap : articleListMap) {
-			articles.add(new Article(articleMap));
-		}
+		List<Article> articles = articleService.showList();
 		System.out.println("== 게시글 목록 ==");
 
 		if (articles.size() == 0) {
@@ -70,64 +46,68 @@ public class ArticleController {
 	}
 
 	public void showDetail(String cmd) {
+
+		int id = articleService.getCmdNum(cmd);
 		
-		int id = Integer.parseInt(cmd.split(" ")[2]);
-		
-		SecSql sql = new SecSql();
-		sql.append("SELECT *");
-		sql.append("FROM article");
-		sql.append("WHERE id = ?", id);
-		
-		Map<String, Object> articleMap = DBUtil.selectRow(conn, sql);
-		
-		if (articleMap.isEmpty()) {
+		if (id == -1) {
+			System.out.println("게시물 번호를 잘못 입력하셨습니다.");
+		}
+
+		Article article = articleService.showDetail(id);
+		if (article == null) {
 			System.out.printf("%d번 게시믈은 존재하지 않습니다.\n", id);
 			return;
 		}
-		
-		Article article = new Article(articleMap);
-		
 		System.out.println("== 게시물 상세보기 ==");
-		
+
 		System.out.printf("번호 : %d \n", article.id);
 		System.out.printf("작성일 : %s \n", article.regDate);
 		System.out.printf("수정일 : %s \n", article.updateDate);
 		System.out.printf("제목 : %s \n", article.title);
 		System.out.printf("내용 : %s \n", article.body);
-		
+
 	}
 
 	public void doModify(String cmd) {
-		int id = Integer.parseInt(cmd.split(" ")[2]);
+		int id = articleService.getCmdNum(cmd);
 		
-		SecSql sql = new SecSql();
-		sql.append("SELECT COUNT(id)");
-		sql.append("FROM article");
-		sql.append("WHERE id = ?", id);
-		
-		int articleCount = DBUtil.selectRowIntValue(conn, sql);
-		
-		if(articleCount == 0) {
+		if (id == -1) {
+			System.out.println("게시물 번호를 잘못 입력하셨습니다.");
+		}
+
+		int articleCount = articleService.getArticleCount(id);
+
+		if (articleCount == 0) {
 			System.out.printf("%d번 게시글이 없습니다.\n", id);
 			return;
 		}
 		System.out.println("== 게시물 수정 ==");
-		
+
 		System.out.print("수정할 제목) ");
 		String title = sc.nextLine();
 		System.out.print("수정할 내용) ");
 		String body = sc.nextLine();
-							
-		sql = new SecSql();
-		sql.append("UPDATE article");
-		sql.append("SET updateDate = NOW()");
-		sql.append(", title = ?", title);
-		sql.append(", `body` = ?", body);
-		sql.append("WHERE id = ?", id);
-		
-		DBUtil.update(conn, sql);
-		
+
+		articleService.doModify(title, body, id);
+
 		System.out.printf("%d 번 게시물이 수정되었습니다. \n", id);
+	}
+
+	public void doDelete(String cmd) {
+		int id = articleService.getCmdNum(cmd);
+		
+		if (id == -1) {
+			System.out.println("게시물 번호를 잘못 입력하셨습니다.");
+		}
+		int articleCount = articleService.getArticleCount(id);
+
+		if (articleCount == 0) {
+			System.out.printf("%d번 게시글이 없습니다.\n", id);
+			return;
+		}
+		articleService.doDelete(id);
+		System.out.printf("%d 번 게시글이 삭제되었습니다.\n", id);
+
 	}
 
 }
