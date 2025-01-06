@@ -5,12 +5,13 @@ import java.util.List;
 import java.util.Scanner;
 
 import com.kwj.JAM.Service.ArticleService;
+import com.kwj.JAM.Session.Session;
 import com.kwj.JAM.dto.Article;
 
 public class ArticleController {
 
 	private ArticleService articleService;
-	private Scanner sc;
+	private Scanner sc; 
 
 	public ArticleController(Connection conn, Scanner sc) {
 		this.articleService = new ArticleService(conn);
@@ -18,11 +19,20 @@ public class ArticleController {
 	}
 
 	public void doWrite() {
+		
+		
+		if (Session.isLogined() == false) {
+			System.out.println("로그인 후 이용해주세요.");
+			return;
+		}
+		
+		
 		System.out.println("== 게시물 작성 ==");
 		System.out.print("제목) ");
 		String title = sc.nextLine().trim();
 		System.out.print("내용) ");
 		String body = sc.nextLine().trim();
+		
 
 		int id = articleService.doWrite(title, body);
 		System.out.println(id + "번 글이 작성되었습니다.");

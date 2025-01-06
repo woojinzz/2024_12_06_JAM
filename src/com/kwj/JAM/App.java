@@ -46,7 +46,9 @@ public class App {
 				else if (cmd.equals("member login")) {
 					memberController.doLogin();
 				}
-				
+				else if (cmd.startsWith("member logout")) {
+					memberController.doLogout();
+				}
 				else if (cmd.equals("article write")) {
 					articleController.doWrite();
 				}
@@ -65,9 +67,7 @@ public class App {
 				else if (cmd.startsWith("article delete")) {
 					articleController.doDelete(cmd);
 				}
-				else if (cmd.startsWith("member logout")) {
-					memberController.dologout(cmd);
-				}
+				
 				else {
 					System.out.println("명령어를 다시 입력해 주세요.");
 					continue;
