@@ -7,6 +7,7 @@ import java.util.Scanner;
 import com.kwj.JAM.Service.ArticleService;
 import com.kwj.JAM.Session.Session;
 import com.kwj.JAM.dto.Article;
+import com.kwj.JAM.util.Util;
 
 public class ArticleController {
 
@@ -51,7 +52,7 @@ public class ArticleController {
 		System.out.println("번호	|		제목		| 		작성일		|		작성자");
 
 		for (Article article : articles) {
-			System.out.printf("%d	|	%s			|	%s	|	%s\n", article.id, article.title, article.regDate, article.writerName);
+			System.out.printf("%d	|	%s			|	%s	|	%s\n", article.id, article.title, Util.dateTimeFormat(article.regDate), article.writerName);
 		}
 	}
 
@@ -71,10 +72,9 @@ public class ArticleController {
 		}
 	
 		System.out.println("== 게시물 상세보기 ==");
-
 		System.out.printf("번호 : %d \n", article.id);
-		System.out.printf("작성일 : %s \n", article.regDate);
-		System.out.printf("수정일 : %s \n", article.updateDate);
+		System.out.printf("작성일 : %s \n", Util.dateTimeFormat(article.regDate));
+		System.out.printf("수정일 : %s \n", Util.dateTimeFormat(article.updateDate));
 		System.out.printf("작성자 : %s \n", article.writerName);
 		System.out.printf("제목 : %s \n", article.title);
 		System.out.printf("내용 : %s \n", article.body);
