@@ -17,8 +17,8 @@ public class ArticleService {
 
 	}
 
-	public int doWrite(String title, String body) {
-		return this.articleDao.doWrite(title, body);
+	public int doWrite(int loginedMemberId, String title, String body) {
+		return this.articleDao.doWrite(loginedMemberId ,title, body);
 	}
 
 	public void doModify(String title, String body, int id) {
@@ -66,5 +66,16 @@ public class ArticleService {
 		} 
 		return id;
 	}
+
+	public Article getArticleById(int id) {
+		
+		Map<String, Object> articleMap = articleDao.showDetail(id);
+		
+		if (articleMap.isEmpty()) {
+			return null;
+		}
+		return new Article(articleMap);
+	}
+
 
 }
