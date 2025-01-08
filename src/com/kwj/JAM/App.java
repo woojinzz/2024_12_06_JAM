@@ -53,8 +53,8 @@ public class App {
 					articleController.doWrite();
 				}
 
-				else if (cmd.equals("article list")) {
-					articleController.showList();
+				else if (cmd.startsWith("article list")) {
+					articleController.showList(cmd);
 				}
 				
 				else if (cmd.startsWith("article detail ")) {

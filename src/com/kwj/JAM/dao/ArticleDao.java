@@ -46,7 +46,7 @@ public class ArticleDao {
 		DBUtil.delete(conn, sql);
 
 	}
-	
+
 	public int getArticleCount(int id) {
 		SecSql sql = new SecSql();
 		sql.append("SELECT COUNT(id)");
@@ -55,13 +55,16 @@ public class ArticleDao {
 		return DBUtil.selectRowIntValue(conn, sql);
 	}
 
-	public List<Map<String, Object>> showList() {
-		
+	public List<Map<String, Object>> showList(String searchKeyword) {
+
 		SecSql sql = new SecSql();
 		sql.append("SELECT a.*, m.loginId AS 'writerName'");
 		sql.append("FROM article AS a");
 		sql.append("INNER JOIN `member` AS m");
 		sql.append("ON a.memberId = m.id");
+		if (searchKeyword.length() > 0) {
+			sql.append("WHERE a.title LIKE CONCAT('%', ?, '%')", searchKeyword);
+		}
 		sql.append("ORDER BY a.id DESC");
 		return DBUtil.selectRows(conn, sql);
 	}
@@ -73,23 +76,22 @@ public class ArticleDao {
 		sql.append("INNER JOIN `member` AS m");
 		sql.append("ON a.memberId = m.id");
 		sql.append("WHERE a.id = ?", id);
-		
+
 		return DBUtil.selectRow(conn, sql);
 	}
 
 	public Map<String, Object> getArticleById(int id) {
-		
+
 		SecSql sql = new SecSql();
 		sql.append("SELECT * FROM article");
 		sql.append("WHERE id = ?", id);
 
 		return DBUtil.selectRow(conn, sql);
-		
-		
+
 	}
 
 	public int increaseVCnt(int id) {
-		
+
 		SecSql sql = new SecSql();
 		sql.append("UPDATE article");
 		sql.append("SET vCnt = vCnt + 1");
@@ -97,7 +99,5 @@ public class ArticleDao {
 
 		return DBUtil.update(conn, sql);
 	}
-
-
 
 }

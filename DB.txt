@@ -17,6 +17,16 @@ ALTER TABLE article ADD memberId int UNSIGNED NOT NULL AFTER updateDate;
 ALTER TABLE article ADD COLUMN vCnt int UNSIGNED NOT NULL DEFAULT 0 AFTER updateDate;
 
 
+CREATE TABLE `member`(
+	id int UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT 
+	, regDate datetime NOT NULL
+	, updateDate datetime NOT NULL
+	, loginId varchar(50) NOT NULL UNIQUE
+	, loginPw varchar(100) NOT NULL
+	, `name` varchar(20) NOT NULL 
+);
+
+
 INSERT INTO article
 	SET regDate = NOW()
 		, updateDate = NOW()
@@ -33,15 +43,6 @@ UPDATE article
 		, updateDate = NOW()
 	WHERE id = 1;
 	
-CREATE TABLE `member`(
-	id int UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT 
-	, regDate datetime NOT NULL
-	, updateDate datetime NOT NULL
-	, loginId varchar(50) NOT NULL UNIQUE
-	, loginPw varchar(100) NOT NULL
-	, `name` varchar(20) NOT NULL 
-);
-
 INSERT INTO `member`
 	SET regDate = NOW()
 		, updateDate = NOW()
